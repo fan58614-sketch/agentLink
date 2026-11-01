@@ -16,4 +16,4 @@
 
 ## 验证状态
 
-文档基线为固件 0.3.2 / 协议 2。用户已确认另一 Agent 通过直接 Control 串口方式成功刷新墨水屏。其他能力与限制见 [验证记录](skills/agentlink-uart-io/references/validation-status.zh-CN.md)，不能以单次成功代替完整量产和跨平台验证。
+文档基线为固件 0.3.3 / 协议 2。用户已确认另一 Agent 通过直接 Control 串口方式成功刷新墨水屏。其他能力与限制见 [验证记录](skills/agentlink-uart-io/references/validation-status.zh-CN.md)，不能以单次成功代替完整量产和跨平台验证。

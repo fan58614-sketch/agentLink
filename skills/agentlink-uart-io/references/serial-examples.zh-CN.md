@@ -98,7 +98,7 @@ finally:
 
 ## 请求和响应
 
-以下交替列出请求和响应，**只发送请求行**。响应结构按固件 0.3.2 源码核对，电平和数据仅为示例，不是新实测结果。输出和任意 SPI 字节都可能改变 DUT，不能原样盲发。
+以下交替列出请求和响应，**只发送请求行**。响应结构按固件 0.3.3 源码核对，电平和数据仅为示例，不是新实测结果。输出和任意 SPI 字节都可能改变 DUT，不能原样盲发。
 
 ```json
 {"id":2,"method":"gpio.configure","pin":0,"mode":"output","initial":0,"safe":"float"}
@@ -107,8 +107,8 @@ finally:
 {"id":3,"result":{"pin":0,"value":1}}
 {"id":4,"method":"gpio.read","pin":0}
 {"id":4,"result":{"pin":0,"value":1}}
-{"id":5,"method":"spi.configure","mode":0,"hz":100000,"read":0,"cs":0}
-{"id":5,"result":{"mode":0,"clock_hz_upper_bound":100000,"read":0,"max_chunk":128,"engine":"software"}}
+{"id":5,"method":"spi.configure","mode":0,"hz":1000000,"read":0,"cs":0}
+{"id":5,"result":{"mode":0,"clock_hz_upper_bound":750000,"actual_hz":750000,"read":0,"max_chunk":128,"engine":"hardware"}}
 {"id":6,"method":"spi.master.transfer","tx_hex":"aabb","cs_hold":0}
 {"id":6,"result":{"transferred":2,"rx_hex":"","cs_held":false}}
 ```
@@ -134,7 +134,7 @@ def spi_bytes(c, data):
     return bytes(received)
 
 # Within the same open Control session, after checking wiring and pin ownership:
-# c.call("spi.configure", mode=0, hz=100000, read=0, cs=0)
+# c.call("spi.configure", mode=0, hz=1000000, read=0, cs=0)
 # data = Path("payload.bin").read_bytes()  # from pathlib import Path
 # spi_bytes(c, data)
 # c.call("spi.release")

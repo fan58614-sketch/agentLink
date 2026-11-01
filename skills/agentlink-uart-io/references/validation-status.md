@@ -2,7 +2,7 @@
 
 **English** | [简体中文](validation-status.zh-CN.md)
 
-Documentation baseline: firmware 0.3.2 / Control protocol 2. This is a development snapshot, not a production qualification report.
+Documentation baseline: firmware 0.3.3 / Control protocol 2. This is a development snapshot, not a production qualification report.
 
 | Area | Evidence and remaining work |
 | --- | --- |
@@ -11,7 +11,7 @@ Documentation baseline: firmware 0.3.2 / Control protocol 2. This is a developme
 | Dual UART CDC | 115200, 1 Mbaud, and 3 Mbaud exercised; bounded concurrent transfers at 3 Mbaud matched. Continuous line-rate and long-duration qualification remain open. |
 | UART1 CTS | Pause/resume physically exercised at 115200. |
 | UART1 RTS | Validation deferred; do not claim qualified RTS/backpressure behavior. |
-| SPI | Mode 0 transmit used through generic MCP to refresh a real display. Other modes and receive need physical validation. |
+| SPI | Firmware 0.3.3 hardware SPI completed Mode 0 display transmission and BUSY refresh at nominal 750 kHz; the user visually confirmed both text lines and black/red patterns. Mode 0–3 and divider configuration checks from 375 kHz to 12 MHz passed, not waveform/DUT qualification at all settings; receive loopback remains unverified. |
 | I2C | Physical bus validation outstanding. |
 | ADC | Current board analog path and measurement accuracy require validation. |
 

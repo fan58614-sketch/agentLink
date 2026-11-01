@@ -16,4 +16,4 @@ Peripheral drivers and image conversion run on the computer; hardware interfaces
 
 ## Validation status
 
-Baseline: firmware 0.3.2 / protocol 2. The user confirmed another agent successfully refreshed an e-paper display through direct Control serial access. See [validation status](skills/agentlink-uart-io/references/validation-status.md) for remaining limits; one success does not establish production or cross-platform qualification.
+Baseline: firmware 0.3.3 / protocol 2. The user confirmed another agent successfully refreshed an e-paper display through direct Control serial access. See [validation status](skills/agentlink-uart-io/references/validation-status.md) for remaining limits; one success does not establish production or cross-platform qualification.
