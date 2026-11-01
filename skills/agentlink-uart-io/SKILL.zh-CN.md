@@ -1,27 +1,26 @@
 # AgentLink
 
-[English](SKILL.md) | **简体中文**
+[English](SKILL.md) | [简体中文](SKILL.zh-CN.md)
 
-使用现有的 AgentLink MCP 工具及其实时参数定义。先调用 `help`，再调用 `device_info`。选择串口前阅读 [USB 识别规则](references/usb-discovery.zh-CN.md)，操作硬件前阅读 [MCP 使用说明](references/mcp-usage.zh-CN.md)。直接访问串口时阅读 [Control 协议](references/control-protocol.zh-CN.md)。
+默认直接通过 **Control USB 串口的 JSON 行协议** 操作设备。不寻找或安装 AgentLink 专用主机软件，不要求 MCP。Skill 是操作说明；Agent 使用已有终端和串口编程能力执行请求。Python + pyserial 是一种实现方式，不是必需的专用工具；环境缺少串口能力时明确报告，不能假装已执行。
 
-按用户指定的语言回复；未指定时跟随用户当前交流语言。工具名、命令、JSON 字段、接口字符串和协议标记保持原样，不翻译。只读取当前任务需要的语言版本，无需同时加载两套文档。标准安装入口仍是 `SKILL.md`，本文件是中文阅读版本。
+按用户语言回复，工具和协议标识不翻译。只读取所需语言版本。标准安装入口仍是 `SKILL.md`。
 
-## 操作流程
+## 开始操作
 
-1. 识别目标物理设备，不向未识别的串口发送探测信息。有歧义时请用户明确选择。
-2. 从用户项目确认 DUT 接线、电压范围和目标操作。使用逻辑 GPIO 名称，不要求用户提供内部芯片型号、封装引脚或内部映射标识。
-3. 检查能力和引脚占用情况，阅读对应操作的实时帮助。改变引脚用途前，先释放原功能。
-4. 操作期间保持连接。驱动输出前配置方向和初始电平，避免与 DUT 输出发生冲突。
-5. 执行操作并检查响应，区分主机接受数据、DUT 响应和用户观察到的物理结果。无法确认部分发送状态时，不自动重试写入。
-6. 完成后恢复约定的安全状态并释放资源。如果输出必须保持，不要关闭维持该状态所需的连接。
+1. 按 [USB 识别](references/usb-discovery.zh-CN.md) 枚举端口和元数据，不向未知串口发送探测数据。确认同一物理设备的 Control、UART1、UART2。
+2. 独占打开确认的 Control，保持一个会话。发送 `device.info` 检查协议 2 和实际能力，读取 `help` 或相关主题至 `END HELP`。
+3. 阅读 [Control 协议](references/control-protocol.zh-CN.md) 和 [完整通信示例](references/serial-examples.zh-CN.md)。请求按行发送并等待对应 id 的响应，不猜测返回结构。
+4. 确认 DUT 接线、3.3 V 电平、方向和安全状态，再配置引脚。被其他功能占用时先明确释放，不抢占现有用途。
+5. 通过通用 GPIO/SPI/I2C 操作外设。外设驱动、图像转换和协议时序由主机代码实现，不修改设备固件、不增加屏幕等专用接口。
+6. 检查响应，区分主机写入、设备执行和 DUT 实际结果。超时或部分写入不自动重发。完成后按 DUT 要求恢复电平并释放资源，最后关闭串口。
 
-## 产品边界
+## 功能边界
 
-- 三路 USB CDC：UART1、Control、UART2。UART1 有 RTS/CTS，UART2 有 TX/RX。两路 UART 默认均为 115200、8N1，关闭流控。
-- 十个逻辑引脚 GPIO0～GPIO9，默认悬空输入。GPIO3/4 可用于 I2C SCL/SDA；GPIO5 可用于 ADC0；GPIO6/7/8/9 可用于 SPI SCK/MISO/MOSI/CS。其余引脚仍可作为 GPIO。
-- 当前原型信号为 3.3 V，不应假定支持 5 V 容忍或 ADC 输入保护。连接 DUT 前确认对应硬件版本的电气限制。
-- 断开连接后的安全状态可配置为悬空或低电平，配置保存在 RAM。设备复位后引脚恢复悬空；软件安全状态不能替代物理上下拉电阻。
-- 提供通用总线能力。屏幕驱动、外设命令序列和图片转换放在主机应用中，不引入屏幕专用固件命令。
-- 当前尚未实现 PWM、周期 GPIO 序列、SPI 从机和电源开关控制。
+- UART1 与 UART2 是独立数据串口，默认 115200/8N1。UART1 有 RTS/CTS，UART2 仅 TX/RX；Control 不提供 UART 字节收发命令。
+- GPIO0～9 默认悬空。GPIO3/4 可用于 I2C SCL/SDA，GPIO5 为 ADC0，GPIO6/7/8/9 可用于 SPI SCK/MISO/MOSI/CS。总线启用会占用对应引脚。
+- 当前原型为 3.3 V 信号，不假定 5 V 容忍或受保护的 ADC 输入。
+- 断连安全状态 float/low 保存在 RAM；设备复位后悬空。软件不能替代物理上下拉。
+- 周期 GPIO、PWM、SPI 从机和电源开关控制尚未实现。普通 GPIO 控制外设的 PWR 使能不等于工具提供电源。
 
-宣称功能或吞吐量经过实物验证前，查阅 [验证状态](references/validation-status.zh-CN.md)。Skill 是操作指导，不会自行安装 MCP 或赋予串口访问权限。
+参阅 [验证状态](references/validation-status.zh-CN.md)。不要用“调用成功”代替实际硬件验证。

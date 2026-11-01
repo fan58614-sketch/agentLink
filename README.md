@@ -1,33 +1,19 @@
 # AgentLink
 
-**English** | [简体中文](README.zh-CN.md)
+[English](README.md) | [简体中文](README.zh-CN.md)
 
-Bilingual skills for AI agents to debug embedded devices with AgentLink via MCP: UART, GPIO, SPI master, I2C master, and ADC.
-
-## What is included
-
-This repository currently distributes **Skill documentation only**. It does not include the MCP server, firmware, hardware design, or an installer. Downloading a Skill does not create MCP tools or grant serial-port access.
-
-AgentLink provides generic hardware operations. Peripheral drivers, display commands, and application logic run on the host using those operations.
+Operating guidance for AI agents debugging embedded devices: use USB Control serial JSON for GPIO, SPI, I2C, and ADC, and two separate UART serial ports for DUT communication.
 
 ## Get started
 
-1. Read [SKILL.md](skills/agentlink-uart-io/SKILL.md), or its [Chinese edition](skills/agentlink-uart-io/SKILL.zh-CN.md).
-2. For an agent that supports Skills, install the complete `skills/agentlink-uart-io/` folder according to that client's instructions. Preserve the references and directory structure. The standard entrypoint is `SKILL.md`.
-3. Separately configure an available AgentLink MCP server, or use a serial-capable environment for direct Control access. A public MCP installation package is not provided here yet.
-4. Follow [USB discovery](skills/agentlink-uart-io/references/usb-discovery.md) to identify the correct device, then query help and capabilities before operating it.
+1. Read [SKILL.md](skills/agentlink-uart-io/SKILL.md). Skill-capable clients may install the complete `skills/agentlink-uart-io/` folder, preserving its structure and standard `SKILL.md` entrypoint.
+2. Follow [USB discovery](skills/agentlink-uart-io/references/usb-discovery.md) to identify Control without transmitting probes to unknown ports.
+3. Use available serial facilities to request `device.info` and `help`, then operate according to actual wiring. See [complete serial examples](skills/agentlink-uart-io/references/serial-examples.md) and [protocol reference](skills/agentlink-uart-io/references/control-protocol.md).
 
-Do not identify ports by transmitting probe data to unknown serial ports. Use USB interface metadata and physical device identity; serial paths differ across computers.
+No AgentLink application, CLI, or MCP server is required. This repository distributes bilingual Skills and documentation snippets, not a software installer. The agent still needs a local execution environment and serial permissions; the Python examples require pyserial.
 
-## Documentation
+Peripheral drivers and image conversion run on the computer; hardware interfaces remain generic. Firmware help currently remains English; documentation supports language switching.
 
-- [MCP usage](skills/agentlink-uart-io/references/mcp-usage.md)
-- [Control serial protocol](skills/agentlink-uart-io/references/control-protocol.md)
-- [USB port identification](skills/agentlink-uart-io/references/usb-discovery.md)
-- [Validation status and limitations](skills/agentlink-uart-io/references/validation-status.md)
+## Validation status
 
-Each document has an English / 简体中文 switch. Tool names and protocol fields remain unchanged in both editions. Firmware and MCP help currently remain English.
-
-## Development status
-
-Documentation baseline: firmware 0.3.2 / Control protocol 2. Capabilities and physical verification are separate: consult the validation record before relying on a feature. This repository does not claim completed cross-platform or production qualification.
+Baseline: firmware 0.3.2 / protocol 2. The user confirmed another agent successfully refreshed an e-paper display through direct Control serial access. See [validation status](skills/agentlink-uart-io/references/validation-status.md) for remaining limits; one success does not establish production or cross-platform qualification.

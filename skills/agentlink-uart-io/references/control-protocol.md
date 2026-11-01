@@ -2,7 +2,7 @@
 
 **English** | [简体中文](control-protocol.zh-CN.md)
 
-Baseline: firmware 0.3.2, Control protocol 2. Discover the correct port using [USB discovery](usb-discovery.md). Keep one connection open; do not share it with MCP or another terminal.
+Baseline: firmware 0.3.2, Control protocol 2. Discover the correct port using [USB discovery](usb-discovery.md). Keep one connection open; do not share it with another program or terminal.
 
 Use UTF-8, one JSON object per line, maximum 767 bytes excluding the terminator. LF, CRLF, and CR are accepted. Send one request and wait for its matching `id` response before sending the next. Responses contain `result` or `error.code`. There is no unsolicited startup banner.
 
@@ -31,4 +31,4 @@ Example, after confirming that GPIO0 may safely be driven:
 {"id":3,"method":"gpio.write","pin":0,"value":1}
 ```
 
-MCP names use underscores and differ from Control method names. MCP UART tools operate the separate UART ports. File paths and automatic SPI file chunking belong to the host MCP implementation, not the Control firmware.
+Read files on the host and send blocks of at most 128 bytes. Control does not accept file paths. See [serial examples](serial-examples.md) for framing, chunking, and error handling.

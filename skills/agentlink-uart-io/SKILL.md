@@ -1,32 +1,31 @@
 ---
 name: agentlink-uart-io
-description: Operate an AgentLink USB tool for embedded DUT debugging through two UARTs, GPIO, SPI master, I2C master, and ADC. Use when a user wants to observe or stimulate connected hardware, including driving a peripheral through generic bus operations.
+description: Control AgentLink USB hardware directly through its serial JSON protocol for embedded debugging with GPIO, SPI, I2C, ADC, and two DUT UARTs. Use when a connected AgentLink should observe or stimulate a DUT; no AgentLink-specific host application is required.
 ---
 
 # AgentLink
 
-**English** | [简体中文](SKILL.zh-CN.md)
+[English](SKILL.md) | [简体中文](SKILL.zh-CN.md)
 
-Use the available AgentLink MCP tools and their live schemas. Start with `help`, then `device_info`. Read [USB discovery](references/usb-discovery.md) before selecting ports and [MCP usage](references/mcp-usage.md) before operating hardware. For direct serial access, read [Control protocol](references/control-protocol.md).
+Operate directly through the **Control USB serial JSON-lines protocol** by default. Do not search for or install an AgentLink host application; MCP is not required. This Skill provides instructions, while the agent uses its existing terminal and serial programming facilities. Python with pyserial is one option, not a required proprietary tool. Report missing serial access instead of pretending to execute operations.
 
-Follow the user's requested language, otherwise their current conversation language. Chinese readers can use the linked Chinese edition and references. Keep tool names, commands, JSON fields, interface strings, and protocol markers unchanged. Read only the language edition needed for the task. `SKILL.md` remains the standard installation entrypoint.
+Follow the user's language; preserve protocol identifiers. Read only the needed language edition. `SKILL.md` is the standard installation entrypoint.
 
 ## Workflow
 
-1. Identify the intended physical device without sending probes to unidentified serial ports. Resolve ambiguity with the user.
-2. Establish DUT wiring, voltage domain, and intended operation from the user's project. Use logical GPIO names; do not require internal chip names, package pins, or internal mapping identifiers.
-3. Inspect capabilities and pin ownership. Read live help for the relevant operation. Release an owned function before assigning its pins elsewhere.
-4. Keep connections open for the operation. Configure direction and initial level before driving outputs; avoid contention with DUT outputs.
-5. Perform the requested operation and inspect responses. Distinguish host acceptance, DUT response, and user-observed physical results. Do not automatically retry writes after uncertain partial transmission.
-6. Restore the agreed safe state and release resources when finished. Do not close a connection that must maintain the requested output.
+1. Follow [USB discovery](references/usb-discovery.md) to enumerate ports and metadata without transmitting probes. Identify Control, UART1, and UART2 belonging to the same physical device.
+2. Exclusively open the identified Control port and keep one session alive. Request `device.info`, verify protocol 2 and capabilities, then read `help` or a relevant topic through `END HELP`.
+3. Read [Control protocol](references/control-protocol.md) and [complete serial examples](references/serial-examples.md). Send one line and wait for its matching response ID. Do not guess response shapes.
+4. Establish DUT wiring, 3.3 V logic, direction, and safe state before configuring outputs. Explicitly release owned pins before reassigning them; do not disrupt an existing function.
+5. Drive peripherals using generic GPIO/SPI/I2C operations. Keep drivers, image conversion, and peripheral sequences in host code; do not change firmware or add display-specific interfaces.
+6. Inspect results and distinguish host writes, device execution, and actual DUT behavior. Never automatically retry uncertain writes. Restore DUT-appropriate levels, release resources, then close the port.
 
-## Product boundaries
+## Boundaries
 
-- Three USB CDC ports: UART1, Control, UART2. UART1 has RTS/CTS; UART2 has TX/RX. Both default to 115200, 8N1, flow control disabled.
-- Ten logical pins, GPIO0 through GPIO9, default to floating input. GPIO3/4 optionally provide I2C SCL/SDA; GPIO5 provides ADC0; GPIO6/7/8/9 provide SPI SCK/MISO/MOSI/CS. Other pins remain GPIO.
-- Current prototype signals are 3.3 V. Do not assume 5 V tolerance or protected ADC inputs. Confirm the hardware revision's electrical limits before connecting a DUT.
-- Disconnect safe state can be floating or low, configured in RAM. A device reset returns pins to floating; software safe state does not replace a physical pull resistor.
-- Expose generic bus capabilities. Keep display drivers, peripheral command sequences, and image conversion in host-side application code. Do not invent display-specific firmware commands.
-- PWM, periodic GPIO sequences, SPI slave, and power-switch control are not currently implemented.
+- UART1 and UART2 are separate data ports, defaulting to 115200/8N1. UART1 has RTS/CTS; UART2 has TX/RX only. Control has no UART byte-send/read methods.
+- GPIO0–9 default to floating. GPIO3/4 optionally provide I2C SCL/SDA, GPIO5 ADC0, and GPIO6/7/8/9 SPI SCK/MISO/MOSI/CS. Enabling a bus claims its pins.
+- Current prototype logic is 3.3 V. Do not assume 5 V tolerance or protected ADC inputs.
+- Disconnect safe state float/low is RAM-only; a device reset restores floating inputs. Software cannot replace physical pull resistors.
+- Periodic GPIO, PWM, SPI slave, and power-switch control are not implemented. Driving a peripheral's PWR enable with GPIO does not mean the tool supplies its power.
 
-Consult [validation status](references/validation-status.md) before claiming a feature or throughput is physically verified. A Skill is operating guidance: it does not itself install MCP or grant serial-port access.
+Consult [validation status](references/validation-status.md). A successful command is not physical verification.

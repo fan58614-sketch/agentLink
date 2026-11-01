@@ -2,7 +2,7 @@
 
 [English](control-protocol.md) | **简体中文**
 
-基线：固件 0.3.2、Control 协议 2。按 [USB 识别规则](usb-discovery.zh-CN.md) 找到正确端口。保持一个连接，不与 MCP 或其他终端共用。
+基线：固件 0.3.2、Control 协议 2。按 [USB 识别规则](usb-discovery.zh-CN.md) 找到正确端口。保持一个连接，不与其他程序或终端共用。
 
 使用 UTF-8，每行一个 JSON 对象，不含行结束符最多 767 字节。接受 LF、CRLF、CR。一次发送一个请求，等待相同 `id` 的响应再发送下一个。响应包含 `result` 或 `error.code`，没有主动启动提示。
 
@@ -31,4 +31,4 @@
 {"id":3,"method":"gpio.write","pin":0,"value":1}
 ```
 
-MCP 工具名使用下划线，与 Control 方法名不同。MCP UART 工具操作独立的 UART 端口。文件路径和 SPI 文件自动分块属于主机 MCP 功能，不属于 Control 固件命令。
+文件由主机读取，再按 128 字节分块发送，Control 不接受文件路径。完整收发、分块和错误处理见 [通信示例](serial-examples.zh-CN.md)。

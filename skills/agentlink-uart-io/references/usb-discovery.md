@@ -32,8 +32,34 @@ Different stacks may expose a communication-interface or data-interface identifi
 
 The prototype serial string is `0123456789`, shared across units. It cannot distinguish two boards. A future release should provide a unique per-device serial; until then physical topology is essential. Re-enumerate after unplug/replug or USB reset rather than assuming an old path remains valid.
 
-## Explicit selection
+## Explicit selection and enumeration
 
-The host MCP supports `AGENTLINK_CONTROL_PORT`, `AGENTLINK_UART1_PORT`, and `AGENTLINK_UART2_PORT`. UART configuration also supports `device_path`. Use paths discovered on this computer, never a path copied from another installation. Explicit selection must still match the intended interface and board.
+Pass the confirmed port path to your serial code; never copy another computer's path. Control and each UART must have a single owner. Close any terminal using that port first.
 
-Keep Control exclusive to one client: close picocom before MCP opens it, and vice versa. Apply the same rule to each UART. Do not seize ports from another process.
+```python
+from serial.tools import list_ports
+for p in list_ports.comports():
+    if (p.vid, p.pid) == (0x1A86, 0xFE0C):
+        print(p.device, p.interface, p.location, p.serial_number, p.hwid)
+```
+
+This only lists candidates; it never opens or guesses a port. If interface metadata is incomplete, inspect native metadata:
+
+macOS:
+```sh
+ioreg -p IOService -l -w 0 > /tmp/agentlink-ioreg.txt
+```
+
+Windows (PowerShell):
+```powershell
+Get-PnpDevice -Class Ports -PresentOnly | Format-List FriendlyName,InstanceId
+# Use the selected InstanceId to inspect parent/location properties:
+Get-PnpDeviceProperty -InstanceId '<selected InstanceId>' | Format-List KeyName,Data
+```
+
+Linux:
+```sh
+udevadm info --attribute-walk --name=/dev/ttyACM0
+```
+
+On macOS, follow each `IOCalloutDevice` parent chain to its USB interface number/name and device location. On Windows inspect that port's MI identifier and USB parent. On Linux follow tty ancestry to `bInterfaceNumber` and the physical USB device; replace the example tty path. Use the role table, not textual proximity alone. Ask for selection if ambiguity remains; never probe by transmitting. Windows/Linux procedures still require physical validation.

@@ -32,8 +32,34 @@
 
 当前原型共用序列号字符串 `0123456789`，不能靠它区分两块板。后续应提供每台设备唯一的序列号；在此之前，物理拓扑尤其重要。拔插或 USB 复位后重新枚举，不假定旧路径仍有效。
 
-## 手动指定
+## 手动选择与实际枚举
 
-主机 MCP 支持 `AGENTLINK_CONTROL_PORT`、`AGENTLINK_UART1_PORT`、`AGENTLINK_UART2_PORT`，UART 配置也支持 `device_path`。必须使用当前电脑发现的路径，不照搬其他电脑的路径。手动选择仍需与目标接口、目标板对应。
+把确认的端口路径传给自己的串口代码；不要复制其他电脑的路径。Control 和各 UART 同时只能由一个程序使用。先关闭占用它的终端。
 
-Control 同时只由一个客户端使用：MCP 打开前先退出 picocom，反之亦然。每路 UART 也遵循同样规则，不抢占其他进程的端口。
+```python
+from serial.tools import list_ports
+for p in list_ports.comports():
+    if (p.vid, p.pid) == (0x1A86, 0xFE0C):
+        print(p.device, p.interface, p.location, p.serial_number, p.hwid)
+```
+
+此代码只列候选，不自动打开或猜测端口。接口元数据不足时，使用下面系统工具进一步核对：
+
+macOS:
+```sh
+ioreg -p IOService -l -w 0 > /tmp/agentlink-ioreg.txt
+```
+
+Windows (PowerShell):
+```powershell
+Get-PnpDevice -Class Ports -PresentOnly | Format-List FriendlyName,InstanceId
+# Use the selected InstanceId to inspect parent/location properties:
+Get-PnpDeviceProperty -InstanceId '<selected InstanceId>' | Format-List KeyName,Data
+```
+
+Linux:
+```sh
+udevadm info --attribute-walk --name=/dev/ttyACM0
+```
+
+macOS 中沿每个 `IOCalloutDevice` 的父节点查找 USB 接口编号/名称和设备位置。Windows 检查对应端口的 MI 编号与父设备；Linux 沿 tty 父链检查 `bInterfaceNumber` 和 USB 设备归属，示例 tty 路径需替换。结合前表判断，不仅凭输出中的字符串相邻关系猜测。仍有歧义就请用户选择，不能试发数据。Windows/Linux 这些步骤仍待实物验证。
