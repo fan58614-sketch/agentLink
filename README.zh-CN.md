@@ -4,11 +4,17 @@
 
 面向 AI Agent 的通用嵌入式调试工具使用指南：通过 USB Control 串口的 JSON 协议操作 GPIO、SPI、I2C、ADC，通过两路独立 UART 串口调试 DUT。
 
-## 使用方式
+## 快速开始
 
-1. 让 Agent 阅读 [中文 Skill](skills/agentlink-uart-io/SKILL.zh-CN.md)。支持 Skill 安装的客户端可安装整个 `skills/agentlink-uart-io/` 目录，保留结构；标准入口是 `SKILL.md`。
-2. 按 [USB 识别规则](skills/agentlink-uart-io/references/usb-discovery.zh-CN.md) 找到设备的 Control，不向未知串口试发数据。
-3. 使用已有串口访问能力，发送 `device.info`、`help`，然后按实际接线操作。参考 [完整通信示例](skills/agentlink-uart-io/references/serial-examples.zh-CN.md) 和 [协议说明](skills/agentlink-uart-io/references/control-protocol.zh-CN.md)。
+给 Agent 这个原始文本入口即可：
+
+https://raw.githubusercontent.com/fan58614-sketch/agentLink/main/skills/agentlink-uart-io/SKILL.zh-CN.md
+
+先读 Skill 和 [快速开始](skills/agentlink-uart-io/references/quick-start.zh-CN.md)，其余文档按需阅读。支持 Skill 的客户端也可安装完整 `skills/agentlink-uart-io/` 目录，标准入口为 `SKILL.md`。
+
+提示词示例：
+
+> 按上述 Skill，直接通过 AgentLink Control 串口操作我已连接的 DUT。先只读快速开始并查询设备能力，再按任务读取所需帮助。我的 DUT、接线和目标如下：（补充实际内容）。
 
 不需要 AgentLink 专用上位机、CLI 或 MCP 服务。仓库交付的是中英文 Skill 与文档代码示例，不是软件安装包。Agent 仍需要本机终端、串口权限和可用运行环境；使用 Python 示例时需要 pyserial。
 
