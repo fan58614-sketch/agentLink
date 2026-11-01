@@ -1,0 +1,3 @@
+interface:
+  display_name: "AgentLink UART + IO"
+  short_description: "Debug embedded devices through UART, GPIO, and buses"
